@@ -614,13 +614,13 @@ var tick = (elapsedTime, multiplier) => {
         // rho calculation
         switch (dimension.level) {
             case 0:
-                currency.value += base_currency_multiplier * (t * q.pow(BigNumber.TWO)).sqrt();
+                currency.value += base_currency_multiplier * (t * q.pow(BigNumber.TWO));
                 break;
             case 1:
-                currency.value += base_currency_multiplier * (t * q.pow(BigNumber.TWO) + (currency_R.value).pow(BigNumber.TWO)).sqrt();
+                currency.value += base_currency_multiplier * (t * q.pow(BigNumber.TWO) + (currency_R.value).pow(BigNumber.TWO));
                 break;
             case 2:
-                currency.value += base_currency_multiplier * a * (t * q.pow(BigNumber.TWO) + (currency_R.value).pow(BigNumber.TWO) + (currency_I.value).pow(BigNumber.TWO)).sqrt();
+                currency.value += base_currency_multiplier * a * (t * q.pow(BigNumber.TWO) + (currency_R.value).pow(BigNumber.TWO) + (currency_I.value).pow(BigNumber.TWO));
                 break;
         }
 
@@ -688,15 +688,15 @@ var getPrimaryEquation = () => {
 
     switch(dimension.level) {
         case 0:
-            result += "\\sqrt{tq^2}\\\\";
+            result += "tq^2\\\\";
             result += "G(t) = g_r + g_i";
             break;
         case 1:
-            result += "\\sqrt{\\text{\\,}tq^2 + R^2\\text{ }}\\\\";
+            result += "\\text{\\,}tq^2 + R^2\\text{ }\\\\";
             result += "G(t) = g_r + g_i";
             break;
         case 2:
-            result += "\\sqrt{\\text{\\,}tq^2 + R^2 + I^2\\text{ }}\\\\";
+            result += "\\text{\\,}tq^2 + R^2 + I^2\\text{ }\\\\";
             result += "G(t) = g_r + g_i";
             break;
     }
