@@ -154,7 +154,7 @@ var tick = (elapsedTime, multiplier) => {
     let dq = dt * S * vc2;
 
     q = q + dq.max(BigNumber.ZERO);
-    currency.value += bonus * vq1 * vq2 * q * dt;
+    currency.value += bonus * vq1 * vq2 * q.pow(5) * dt;
 
     theory.invalidateTertiaryEquation();
 }
@@ -178,7 +178,7 @@ var getPrimaryEquation = () => {
     let result = "\\begin{matrix}"
     result += "\\dot{\\rho}=q_1";
     if (q1Exp.level > 0) result += `^{${1+q1Exp.level*0.01}}`;
-    result += "q_2q,\\quad\\dot{q} = "
+    result += "q_2 q^5,\\quad\\dot{q} = "
 	if (c2Term.level > 0) result += "c_2\\cdot ";
 	result += "\s_n(\\chi)/\\sin(\\chi)\\\\\\\\";
 	result += "s_n(x) := x\\cdot\\prod_{k=1}^n\\left(1-\\frac{x}{k\\pi}^{\\ 2}\\right) "
