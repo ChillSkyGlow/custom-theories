@@ -206,7 +206,7 @@ var getTertiaryEquation = () => {
 }
 
 var getPublicationMultiplier = (tau) => tau.isZero ? BigNumber.ONE : tau.pow(BigNumber.from(1.5/tauMultiplier));
-var getPublicationMultiplierFormula = (symbol) => "{" + symbol + "}^{0.375}";
+var getPublicationMultiplierFormula = (symbol) => "{" + symbol + "}^{5.000}";
 var getTau = () => currency.value.pow(BigNumber.from(0.5*tauMultiplier));
 var getCurrencyFromTau = (tau) => [tau.max(BigNumber.ONE).pow(2/tauMultiplier), currency.symbol];
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
