@@ -4,12 +4,12 @@ import { parseBigNumber, BigNumber } from "./api/BigNumber";
 import { theory } from "./api/Theory";
 import { Utils } from "./api/Utils";
 
-var id = "weierstrass-product-sine";
-var name = "Weierstraß Sine Product";
-var description = "Exploit the inaccuracy of sine's product representation, a result due to Euler which was rigorously proved later by Weierstraß using his famous Factorization Theorem.\n\nIntuitively, the idea behind this formula is to factorize sine using its roots (sine has zeros at each multiple of π), just as one would do for a polynomial.\n\nThe product s_n represents only the n first factors of this infinite product (together with the root at x=0), which means there is some error between s_n(x) and the actual sin(x), depending on n and x. Note that this truncated product s_n approximates sin(x) better for bigger n and smaller x, in particular the approximation becomes bad for a fixed n when x gets large in the sense that the ratio s_n(x)/sin(x) diverges for x -> infty.\n\nHere, the derivative of q with respect to time is set to s_n(χ)/sin(χ) i.e. the ratio from before evaluated at χ (chi), which itself is a value depending on n. Note that increasing n both increases χ and the accuracy of the approximation s_n.";
+var id = "1-weierstrass-product-sine";
+var name = "1-Weierstraß Sine Product1";
+var description = "[副本1] Exploit the inaccuracy of sine's product representation, a result due to Euler which was rigorously proved later by Weierstraß using his famous Factorization Theorem.\n\nIntuitively, the idea behind this formula is to factorize sine using its roots (sine has zeros at each multiple of π), just as one would do for a polynomial.\n\nThe product s_n represents only the n first factors of this infinite product (together with the root at x=0), which means there is some error between s_n(x) and the actual sin(x), depending on n and x. Note that this truncated product s_n approximates sin(x) better for bigger n and smaller x, in particular the approximation becomes bad for a fixed n when x gets large in the sense that the ratio s_n(x)/sin(x) diverges for x -> infty.\n\nHere, the derivative of q with respect to time is set to s_n(χ)/sin(χ) i.e. the ratio from before evaluated at χ (chi), which itself is a value depending on n. Note that increasing n both increases χ and the accuracy of the approximation s_n.";
 var authors = "xelaroc (AlexCord#6768)";
 var version = 5;
-var releaseOrder = "1";
+var releaseOrder = "101";
 
 requiresGameVersion("1.4.33");
 
@@ -18,6 +18,7 @@ var tauMultiplier = 4;
 var q = BigNumber.ONE;
 var chi = BigNumber.ONE;
 var S = BigNumber.ZERO;
+var dq = BigNumber.ZERO;
 
 // χ and s_n(χ)/sin(χ) don't need to be evaluated at each tick; only when c1 or n is bought or chiDivN milestone
 var updateSineRatio_flag = true;
@@ -151,10 +152,10 @@ var tick = (elapsedTime, multiplier) => {
         S = sineRatioK(n.level, chi.toNumber()/Math.PI);
         updateSineRatio_flag = false;
     }
-    let dq = dt * S * vc2;
+    dq = dt * S * vc2;
 
     q = q + dq.max(BigNumber.ZERO);
-    currency.value += bonus * vq1 * vq2 * q * dt;
+    currency.value += bonus * vq1 * vq2 * q.pow(2) * dt;
 
     theory.invalidateTertiaryEquation();
 }
@@ -178,7 +179,7 @@ var getPrimaryEquation = () => {
     let result = "\\begin{matrix}"
     result += "\\dot{\\rho}=q_1";
     if (q1Exp.level > 0) result += `^{${1+q1Exp.level*0.01}}`;
-    result += "q_2q,\\quad\\dot{q} = "
+    result += "q_2q^2,\\quad\\dot{q} = "
 	if (c2Term.level > 0) result += "c_2\\cdot ";
 	result += "\s_n(\\chi)/\\sin(\\chi)\\\\\\\\";
 	result += "s_n(x) := x\\cdot\\prod_{k=1}^n\\left(1-\\frac{x}{k\\pi}^{\\ 2}\\right) "
@@ -187,7 +188,7 @@ var getPrimaryEquation = () => {
 }
 
 var getSecondaryEquation = () => {
-    let result = theory.latexSymbol + "=\\max\\rho^{0.4},\\quad\\chi =\\pi\\cdot\\frac{c_1n}{c_1+n";
+    let result = theory.latexSymbol + "=\\max\\rho^{1.0},\\quad\\chi =\\pi\\cdot\\frac{c_1n}{c_1+n";
     if (chiDivN.level > 0) result += "/3^{" + chiDivN.level + "}";
     result += "}+1";
     return result;
@@ -197,18 +198,22 @@ var getTertiaryEquation = () => {
     let result = "";
 
     result += "\\begin{matrix}q=";
-    result += q.toString();
+    result += q.toString(); // q 保持原格式输出
+    result += ",&\\dot{q}=";
+    result += dq.toString(3); // q 的导数
+    result += ",&s_{n}(x)=";
+    result += S.toString(3); // S_n(x)
     result += ",&\\chi =";
-    result += chi.toString(3);
+    result += chi.toString(3); // 原有 chi
     result += "\\end{matrix}";
 
     return result;
 }
 
-var getPublicationMultiplier = (tau) => tau.isZero ? BigNumber.ONE : tau.pow(BigNumber.from(1.5/tauMultiplier));
-var getPublicationMultiplierFormula = (symbol) => "{" + symbol + "}^{0.375}";
-var getTau = () => currency.value.pow(BigNumber.from(0.1*tauMultiplier));
-var getCurrencyFromTau = (tau) => [tau.max(BigNumber.ONE).pow(10/tauMultiplier), currency.symbol];
+var getPublicationMultiplier = (tau) => tau.isZero ? BigNumber.ONE : tau.pow(BigNumber.from(4.0/tauMultiplier));
+var getPublicationMultiplierFormula = (symbol) => "{" + symbol + "}^{1.000}";
+var getTau = () => currency.value.pow(BigNumber.from(0.25*tauMultiplier));
+var getCurrencyFromTau = (tau) => [tau.max(BigNumber.ONE).pow(4/tauMultiplier), currency.symbol];
 var get2DGraphValue = () => currency.value.sign * (BigNumber.ONE + currency.value.abs()).log10().toNumber();
 
 var getN = (level) => BigNumber.from(level);
